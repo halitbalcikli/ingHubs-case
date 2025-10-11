@@ -18,7 +18,8 @@ export class AddEditEmployee extends LitElement {
       birthDate: '',
       phone: '',
       email: '',
-      department: ''  ,
+      department: '',
+      position: ''
     };
     this.positions = ['Junior', 'Mid', 'Senior'];
   }
@@ -26,9 +27,9 @@ export class AddEditEmployee extends LitElement {
   _submit(e) {
     e.preventDefault();
     
-    // Tüm form alanlarını validate et
     const formFields = this.shadowRoot.querySelectorAll('form-field');
     let isValid = true;
+
     
     formFields.forEach(field => {
       if (!field.validate()) {
@@ -37,19 +38,20 @@ export class AddEditEmployee extends LitElement {
     });
 
     if (!isValid) {
-      alert('Lütfen tüm zorunlu alanları doğru şekilde doldurunuz!');
+      this._showToast('Lütfen tüm zorunlu alanları doğru şekilde doldurunuz!');
       return;
     }
 
     store.dispatch(addEmployee(this.employee));
-    alert('Çalışan başarıyla eklendi!');
 
     this.employee = { firstName:'', lastName:'', startDate:'', birthDate:'', phone:'', email:'', department:'', position:'' };
     this.requestUpdate();
   }
 
   _updateField(key, e) {
-    this.employee[key] = e.target.value;
+    // CustomEvent kullanıldığı için e.detail.value kontrol et
+    this.employee[key] = e.detail?.value ?? e.target.value;
+    console.log(`Updated ${key}:`, this.employee[key], 'Full employee:', this.employee);
     this.requestUpdate();
   }
 

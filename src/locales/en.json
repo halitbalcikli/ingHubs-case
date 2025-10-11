@@ -4,5 +4,6 @@
   "about": "About",
   "employeeListTitle": "Employee List 👥",
   "aboutPageTitle": "About Page ℹ️",
-  "aboutText": "This app is built with LitElement and Vaadin Router."
+  "aboutText": "This app is built with LitElement and Vaadin Router.",
+  "employeeList": "Employee List"
 }
