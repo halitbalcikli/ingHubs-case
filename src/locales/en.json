@@ -1,0 +1,8 @@
+{
+  "appTitle": "ING Case",
+  "employees": "Employees",
+  "about": "About",
+  "employeeListTitle": "Employee List 👥",
+  "aboutPageTitle": "About Page ℹ️",
+  "aboutText": "This app is built with LitElement and Vaadin Router."
+}
