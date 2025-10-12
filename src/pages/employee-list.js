@@ -1,17 +1,23 @@
 import { LitElement, html, css } from 'lit';
 import { store, deleteEmployee } from '../store.js';
 import { i18n } from '../i18n/i18n.js';
+
 import trashIcon from '../assets/icons/trash.svg';
 import trashGridIcon from '../assets/icons/trash-grid.svg';
+
 import editIcon from '../assets/icons/edit.svg';
 import editGridIcon from '../assets/icons/edit-grid.svg';
+
 import gridIcon from '../assets/icons/grid-gap.svg';
 import menuIcon from '../assets/icons/menu.svg';
+
 import { Router } from '@vaadin/router';
+
+import '../components/pagination-component.js';
 
 export class EmployeeList extends LitElement {
   static styles = css`
-    section { background: #F1F2F7; height: 100vh;} 
+    section { background: #F1F2F7; height: 100vh; overflow-y:auto; } 
     table { width: 100%; border-collapse: collapse; } 
     th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
     .employee-card-container {
@@ -68,6 +74,7 @@ export class EmployeeList extends LitElement {
       accent-color: #999;
     }
     .employee-table-cell {
+      padding: 1rem;
       border-bottom: 1px solid #ccc;
       border-top: none;
       border-left: none;
@@ -89,11 +96,22 @@ export class EmployeeList extends LitElement {
     }
   `;
 
+  static properties = {
+    view: { type: String },
+    employees: { type: Array },
+    selectedEmployees: { type: Object },
+    currentPage: { type: Number },
+    itemsPerPage: { type: Number },
+  };
+
   constructor() {
     super();
     this.view = 'table';
     this.employees = store.getState().employees;
-    this.selectedEmployees = new Set(); // Seçilen çalışanları tutar
+    this.selectedEmployees = new Set();
+
+    this.currentPage = 1;
+    this.itemsPerPage = 5; 
 
     store.subscribe(() => {
       this.employees = store.getState().employees;
@@ -104,6 +122,12 @@ export class EmployeeList extends LitElement {
       this.lang = e.detail.lang;
       this.requestUpdate();
     });
+  }
+
+  get paginatedEmployees() {
+    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const end = start + this.itemsPerPage;
+    return this.employees.slice(start, end);
   }
 
   changeView(view) {
@@ -122,6 +146,10 @@ export class EmployeeList extends LitElement {
     const index = this.employees.findIndex(e => e === emp);
     if (index !== -1 && confirm(`${emp.firstName} ${emp.lastName} adlı çalışanı silmek istediğinize emin misiniz?`)) {
       store.dispatch(deleteEmployee(index));
+
+      if (this.paginatedEmployees.length === 1 && this.currentPage > 1) {
+        this.currentPage--;
+      }
     }
   }
 
@@ -135,10 +163,11 @@ export class EmployeeList extends LitElement {
   }
 
   handleSelectAll(event) {
+    const currentPageEmployees = this.paginatedEmployees;
     if (event.target.checked) {
-      this.selectedEmployees = new Set(this.employees);
+      currentPageEmployees.forEach(emp => this.selectedEmployees.add(emp));
     } else {
-      this.selectedEmployees.clear();
+      currentPageEmployees.forEach(emp => this.selectedEmployees.delete(emp));
     }
     this.requestUpdate();
   }
@@ -160,8 +189,15 @@ export class EmployeeList extends LitElement {
     }
   }
 
+  handlePageChange(e) {
+    this.currentPage = e.detail.page;
+    this.requestUpdate();
+  }
+
   render() {
-    const allSelected = this.selectedEmployees.size === this.employees.length && this.employees.length > 0;
+    const allSelected =
+      this.paginatedEmployees.length > 0 &&
+      this.paginatedEmployees.every(emp => this.selectedEmployees.has(emp));
 
     return html`
       <section>
@@ -169,10 +205,10 @@ export class EmployeeList extends LitElement {
           <div class="action-bar">
             <h2 class="employee-list-title">${i18n.t('employeeList')}</h2>
             <div style="display:flex; gap:0.5rem; align-items:center;">
-              
-              ${this.selectedEmployees.size > 0 ? html`<button class="bulk-delete-button" @click=${this.handleBulkDelete}>
-                ${i18n.t('deleteSelected') || 'Seçilenleri Sil'}
-              </button>` : ''}
+              ${this.selectedEmployees.size > 0 ? html`
+                <button class="bulk-delete-button" @click=${this.handleBulkDelete}>
+                  ${i18n.t('deleteSelected') || 'Seçilenleri Sil'}
+                </button>` : ''}
               <img @click=${() => this.changeView('table')} src=${menuIcon} alt="Tablo Görünümü" style="width: 24px; height: 24px; cursor: pointer;" />
               <img @click=${() => this.changeView('card')} src=${gridIcon} alt="Kart Görünümü" style="width: 24px; height: 24px; cursor: pointer;" />
             </div>
@@ -185,48 +221,41 @@ export class EmployeeList extends LitElement {
                   <th class="employee-table-cell">
                     <input type="checkbox" @change=${this.handleSelectAll} .checked=${allSelected} />
                   </th>
-                  <th class="employee-table-cell">${i18n.t('name')}</th>
-                  <th class="employee-table-cell">${i18n.t('lastName')}</th>
-                  <th class="employee-table-cell">${i18n.t('startDate')}</th>
-                  <th class="employee-table-cell">${i18n.t('birthDate')}</th>
-                  <th class="employee-table-cell">${i18n.t('phone')}</th>
-                  <th class="employee-table-cell">${i18n.t('email')}</th>
-                  <th class="employee-table-cell">${i18n.t('department')}</th>
-                  <th class="employee-table-cell">${i18n.t('position')}</th>
-                  <th class="employee-table-cell">${i18n.t('actions')}</th>
+                  <th>${i18n.t('name')}</th>
+                  <th>${i18n.t('lastName')}</th>
+                  <th>${i18n.t('startDate')}</th>
+                  <th>${i18n.t('birthDate')}</th>
+                  <th>${i18n.t('phone')}</th>
+                  <th>${i18n.t('email')}</th>
+                  <th>${i18n.t('department')}</th>
+                  <th>${i18n.t('position')}</th>
+                  <th>${i18n.t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
-                ${this.employees.map(emp => html`
-                  <tr class="employee-table-row">
-                    <td class="employee-table-cell">
-                      <input
-                        style="width: 16px; height: 16px; cursor: pointer;"
-                        type="checkbox"
-                        .checked=${this.selectedEmployees.has(emp)}
-                        @change=${(e) => this.handleSelectEmployee(emp, e)}
-                      />
-                    </td>
-                    <td class="employee-table-cell">${emp.firstName}</td>
-                    <td class="employee-table-cell">${emp.lastName}</td>
-                    <td class="employee-table-cell">${emp.startDate}</td>
-                    <td class="employee-table-cell">${emp.birthDate}</td>
-                    <td class="employee-table-cell">${emp.phone}</td>
-                    <td class="employee-table-cell">${emp.email}</td>
-                    <td class="employee-table-cell">${emp.department}</td>
-                    <td class="employee-table-cell">${emp.position}</td>
-                    <td class="employee-table-cell">
-                      <img @click=${() => this.handleEditEmployee(emp)} src=${editIcon} alt="Düzenle" style="width: 20px; height: 20px; cursor: pointer;" />
-                      <img @click=${() => this.handleDeleteEmployee(emp)} src=${trashIcon} alt="Sil" style="width: 20px; height: 20px; cursor: pointer;" />
+                ${this.paginatedEmployees.map(emp => html`
+                  <tr>
+                    <td><input type="checkbox" .checked=${this.selectedEmployees.has(emp)} @change=${(e) => this.handleSelectEmployee(emp, e)} /></td>
+                    <td>${emp.firstName}</td>
+                    <td>${emp.lastName}</td>
+                    <td>${emp.startDate}</td>
+                    <td>${emp.birthDate}</td>
+                    <td>${emp.phone}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.department}</td>
+                    <td>${emp.position}</td>
+                    <td>
+                      <img @click=${() => this.handleEditEmployee(emp)} src=${editIcon} style="width:20px; cursor:pointer;" />
+                      <img @click=${() => this.handleDeleteEmployee(emp)} src=${trashIcon} style="width:20px; cursor:pointer;" />
                     </td>
                   </tr>
                 `)}
               </tbody>
             </table>
           ` : html`
-            <!-- Kart görünümü aynı kalıyor -->
+          
             <div class="employee-card-container">
-              ${this.employees.map(emp => html`
+              ${this.paginatedEmployees.map(emp => html`
                 <div class="employee-card">
                   <div class="employee-info-grid">
                     <div><strong>Adı:</strong> ${emp.firstName}</div>
@@ -239,19 +268,24 @@ export class EmployeeList extends LitElement {
                     <div><strong>Pozisyon:</strong> ${emp.position}</div>
                   </div>
                   <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
-                    <button style="display:flex; align-items:center; justify-content:center; background: #091C5A; color: #fff; padding: 12px; border-radius: 4px; cursor: pointer;" class="edit-button" @click=${() => this.handleEditEmployee(emp)}>
-                      <img src=${editGridIcon} alt="Düzenle" style="width: 20px; height: 20px;" />
-                      ${i18n.t('edit')}
+                    <button style="background:#091C5A; color:white; padding:8px; border-radius:4px;" @click=${() => this.handleEditEmployee(emp)}>
+                      <img src=${editGridIcon} style="width:18px; margin-right:4px;"> ${i18n.t('edit')}
                     </button>
-                    <button style="display:flex; align-items:center; justify-content:center; background: #FF6600; color: #fff; padding: 12px; border-radius: 4px; cursor: pointer;" class="delete-button" @click=${() => this.handleDeleteEmployee(emp)}>
-                      <img src=${trashGridIcon} alt="Sil" style="width: 20px; height: 20px;" />
-                      ${i18n.t('delete')}
+                    <button style="background:#FF6600; color:white; padding:8px; border-radius:4px;" @click=${() => this.handleDeleteEmployee(emp)}>
+                      <img src=${trashGridIcon} style="width:18px; margin-right:4px;"> ${i18n.t('delete')}
                     </button>
                   </div>
                 </div>
               `)}
             </div>
           `}
+
+          <pagination-component
+            .totalItems=${this.employees.length}
+            .itemsPerPage=${this.itemsPerPage}
+            .currentPage=${this.currentPage}
+            @page-change=${this.handlePageChange}
+          ></pagination-component>
         </div>
       </section>
     `;
