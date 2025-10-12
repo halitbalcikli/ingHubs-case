@@ -17,5 +17,6 @@
   "position": "Pozisyon",
   "actions": "İşlemler",
   "edit": "Düzenle",
-  "delete": "Sil"
+  "delete": "Sil",
+  "deleteSelected": "Seçilenleri Sil"
 }

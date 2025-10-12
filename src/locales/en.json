@@ -15,5 +15,6 @@
   "position": "Position",
   "actions": "Actions",
   "edit": "Edit",
-  "delete": "Delete"
+  "delete": "Delete",
+  "deleteSelected": "Delete Selected"
 }
