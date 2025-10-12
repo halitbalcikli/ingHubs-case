@@ -18,5 +18,9 @@
   "actions": "İşlemler",
   "edit": "Düzenle",
   "delete": "Sil",
-  "deleteSelected": "Seçilenleri Sil"
+  "deleteSelected": "Seçilenleri Sil",
+  "cancel": "İptal",
+  "save": "Kaydet",
+  "editEmployee": "Çalışanı Düzenle",
+  "addEmployee": "Çalışan Ekle"
 }

@@ -1,13 +1,77 @@
 import { LitElement, html, css } from 'lit';
 import { Router } from '@vaadin/router';
+import { i18n } from '../i18n/i18n.js';
+
 import '../components/form-field.js';
+
 import { store, addEmployee, updateEmployee } from '../store.js';
 
 export class AddEditEmployee extends LitElement {
   static styles = css`
-    .form-grid { display: flex; flex-wrap: wrap; gap: 1rem; }
-    .row { display: flex; flex: 1 1 100%; gap: 1rem; }
-    button { margin-top: 1rem; padding: 0.5rem 1rem; }
+    section { 
+      background: #F1F2F7; 
+      height: 100vh; 
+      overflow-y: auto; 
+    }
+    .container {
+      width: 80%; 
+      margin: 40px auto; 
+      max-width: 1100px;
+    }
+    h2 {
+      color: #FF6600;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      padding-left: 0.5rem;
+      font-size: 1.6rem;
+    }
+    form {
+      background: #fff; 
+      padding: 2.5rem; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap; 
+      justify-content: flex-start;
+      align-items: flex-start;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+    form-field {
+      flex: 0 0 calc((100% - 4rem) / 3); 
+      box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+      form-field {
+        flex: 0 0 calc((100% - 2rem) / 2);
+      }
+    }
+    @media (max-width: 600px) {
+      form-field {
+        flex: 0 0 100%;
+      }
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+      gap: 1rem;
+    }
+    button {
+      padding: 0.7rem 1.5rem;
+      background: #FF6600;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.2s ease-in-out;
+    }
+    button:hover {
+      background: #e65c00;
+      transform: translateY(-1px);
+    }
   `;
 
   constructor() {
@@ -24,6 +88,11 @@ export class AddEditEmployee extends LitElement {
     };
     this.positions = ['Junior', 'Mid', 'Senior'];
     this.editIndex = null;
+
+    window.addEventListener('lang-changed', (e) => {
+      this.lang = e.detail.lang;
+      this.requestUpdate();
+    });
   }
 
   // ✅ @vaadin/router buraya location bilgisini geçirir
@@ -69,28 +138,36 @@ export class AddEditEmployee extends LitElement {
   render() {
     const isEdit = this.editIndex !== null;
     return html`
-      <h2>${isEdit ? 'Çalışanı Düzenle' : 'Çalışan Ekle'}</h2>
-      <form @submit=${this._submit}>
-        <div class="form-grid">
-          <div class="row">
-            <form-field label="Adı" type="text" .value=${this.employee.firstName} @input=${e=>this._updateField('firstName', e)} required></form-field>
-            <form-field label="Soyadı" type="text" .value=${this.employee.lastName} @input=${e=>this._updateField('lastName', e)} required></form-field>
-            <form-field label="İşe Giriş Tarihi" type="date" .value=${this.employee.startDate} @input=${e=>this._updateField('startDate', e)} required></form-field>
-          </div>
-          <div class="row">
-            <form-field label="Doğum Tarihi" type="date" .value=${this.employee.birthDate} @input=${e=>this._updateField('birthDate', e)} required></form-field>
-            <form-field label="Telefon" type="tel" .value=${this.employee.phone} @input=${e=>this._updateField('phone', e)} required></form-field>
-            <form-field label="Email" type="email" .value=${this.employee.email} @input=${e=>this._updateField('email', e)} required></form-field>
-          </div>
-          <div class="row">
-            <form-field label="Departman" type="text" .value=${this.employee.department} @input=${e=>this._updateField('department', e)} required></form-field>
-            <form-field label="Pozisyon" type="select" .value=${this.employee.position} .options=${this.positions} @input=${e=>this._updateField('position', e)} required></form-field>
-          </div>
+      <section>
+        <div class="container">
+          <h2>${isEdit ? i18n.t('editEmployee') : i18n.t('addEmployee')}</h2>
+          <form @submit=${this._submit}>
+            <div class="row">
+              <form-field label="Adı" type="text" .value=${this.employee.firstName} @input=${e=>this._updateField('firstName', e)} required></form-field>
+              <form-field label="Soyadı" type="text" .value=${this.employee.lastName} @input=${e=>this._updateField('lastName', e)} required></form-field>
+              <form-field label="İşe Giriş Tarihi" type="date" .value=${this.employee.startDate} @input=${e=>this._updateField('startDate', e)} required></form-field>
+            </div>
+  
+            <div class="row">
+              <form-field label="Doğum Tarihi" type="date" .value=${this.employee.birthDate} @input=${e=>this._updateField('birthDate', e)} required></form-field>
+              <form-field label="Telefon" type="tel" .value=${this.employee.phone} @input=${e=>this._updateField('phone', e)} required></form-field>
+              <form-field label="Email" type="email" .value=${this.employee.email} @input=${e=>this._updateField('email', e)} required></form-field>
+            </div>
+  
+            <div class="row">
+              <form-field label="Departman" type="text" .value=${this.employee.department} @input=${e=>this._updateField('department', e)} required></form-field>
+              <form-field label="Pozisyon" type="select" .value=${this.employee.position} .options=${this.positions} @input=${e=>this._updateField('position', e)} required></form-field>
+            </div>
+  
+            <div class="actions">
+              <button type="submit">${isEdit ? 'Güncelle' : 'Ekle'}</button>
+            </div>
+          </form>
         </div>
-        <button type="submit">${isEdit ? 'Güncelle' : 'Ekle'}</button>
-      </form>
+      </section>
     `;
   }
+  
 }
 
 customElements.define('add-edit-employee', AddEditEmployee);

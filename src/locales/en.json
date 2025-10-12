@@ -16,5 +16,9 @@
   "actions": "Actions",
   "edit": "Edit",
   "delete": "Delete",
-  "deleteSelected": "Delete Selected"
+  "deleteSelected": "Delete Selected",
+  "cancel": "Cancel",
+  "save": "Save",
+  "editEmployee": "Edit Employee",
+  "addEmployee": "Add Employee"
 }
