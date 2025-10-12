@@ -23,8 +23,8 @@ export class EmployeeList extends LitElement {
     .employee-card-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      width: 80%;
+      gap: 24px;
+      width: 85%;
       margin: 20px auto;
     }
     .employee-list-container {
@@ -33,14 +33,18 @@ export class EmployeeList extends LitElement {
     }
     .employee-card {
       background: #f6f6f6;
-      border-radius: 12px;
       padding: 16px;
+      margin-right: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .employee-card-square {
+      width: 450px;
+      object-fit: cover;
     }
     .employee-info-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 8px 16px;
+      gap: 16px 16px;
     }
     .employee-info-grid div {
       font-size: 14px;
@@ -256,16 +260,16 @@ export class EmployeeList extends LitElement {
           
             <div class="employee-card-container">
               ${this.paginatedEmployees.map(emp => html`
-                <div class="employee-card">
+                <div class="employee-card employee-card-square">
                   <div class="employee-info-grid">
-                    <div><strong>Adı:</strong> ${emp.firstName}</div>
-                    <div><strong>Soyadı:</strong> ${emp.lastName}</div>
-                    <div><strong>İşe Giriş:</strong> ${emp.startDate}</div>
-                    <div><strong>Doğum:</strong> ${emp.birthDate}</div>
-                    <div><strong>Telefon:</strong> ${emp.phone}</div>
-                    <div><strong>Email:</strong> ${emp.email}</div>
-                    <div><strong>Departman:</strong> ${emp.department}</div>
-                    <div><strong>Pozisyon:</strong> ${emp.position}</div>
+                    <div><strong>${i18n.t('name')}:</strong> <div>${emp.firstName}</div></div>
+                    <div><strong>${i18n.t('lastName')}:</strong> <div>${emp.lastName}</div></div>
+                    <div><strong>${i18n.t('startDate')}:</strong> <div>${emp.startDate}</div></div>
+                    <div><strong>${i18n.t('birthDate')}:</strong> <div>${emp.birthDate}</div></div>
+                    <div><strong>${i18n.t('phone')}:</strong> <div>${emp.phone}</div></div>
+                    <div><strong>${i18n.t('email')}:</strong> <div>${emp.email}</div></div>
+                    <div><strong>${i18n.t('department')}:</strong> <div>${emp.department}</div></div>
+                    <div><strong>${i18n.t('position')}:</strong> <div>${emp.position}</div></div>
                   </div>
                   <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
                     <button style="background:#091C5A; color:white; padding:8px; border-radius:4px;" @click=${() => this.handleEditEmployee(emp)}>
