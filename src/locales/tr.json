@@ -5,5 +5,17 @@
   "employeeListTitle": "Çalışan Listesi 👥",
   "aboutPageTitle": "Hakkında Sayfası ℹ️",
   "aboutText": "Bu uygulama LitElement ve Vaadin Router kullanılarak yapılmıştır.",
-  "employeeList": "Çalışan Listesi"
+  "employeeList": "Çalışan Listesi",
+  "addNew": "Yeni Ekle",
+  "name": "Adı",
+  "lastName": "Soyadı",
+  "startDate": "İşe Giriş",
+  "birthDate": "Doğum",
+  "phone": "Telefon",
+  "email": "Email",
+  "department": "Departman",
+  "position": "Pozisyon",
+  "actions": "İşlemler",
+  "edit": "Düzenle",
+  "delete": "Sil"
 }

@@ -3,7 +3,17 @@
   "employees": "Employees",
   "about": "About",
   "employeeListTitle": "Employee List 👥",
-  "aboutPageTitle": "About Page ℹ️",
-  "aboutText": "This app is built with LitElement and Vaadin Router.",
-  "employeeList": "Employee List"
+  "employeeList": "Employee List",
+  "addNew": "Add New",
+  "name": "First Name",
+  "lastName": "Last Name",
+  "startDate": "Date of Employment",
+  "birthDate": "Date of Birth",
+  "phone": "Phone",
+  "email": "Email",
+  "department": "Department",
+  "position": "Position",
+  "actions": "Actions",
+  "edit": "Edit",
+  "delete": "Delete"
 }
