@@ -20,5 +20,7 @@
   "cancel": "Cancel",
   "save": "Save",
   "editEmployee": "Edit Employee",
-  "addEmployee": "Add Employee"
+  "addEmployee": "Add Employee",
+  "add": "Add",
+  "update": "Update"
 }

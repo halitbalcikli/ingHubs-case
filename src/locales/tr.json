@@ -22,5 +22,7 @@
   "cancel": "İptal",
   "save": "Kaydet",
   "editEmployee": "Çalışanı Düzenle",
-  "addEmployee": "Çalışan Ekle"
+  "addEmployee": "Çalışan Ekle",
+  "add": "Ekle",
+  "update": "Güncelle"
 }

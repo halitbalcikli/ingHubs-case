@@ -68,9 +68,22 @@ export class AddEditEmployee extends LitElement {
       font-size: 1rem;
       transition: all 0.2s ease-in-out;
     }
-    button:hover {
-      background: #e65c00;
-      transform: translateY(-1px);
+    .save-button {
+      background: #FF6600;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 20%;
+    }
+    .cancel-button {
+      background: #FFF;
+      color: #000;
+      border-color: #7f03fc;
+      border-style: solid;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 20%;
     }
   `;
 
@@ -135,6 +148,10 @@ export class AddEditEmployee extends LitElement {
     Router.go('/');
   }
 
+  _cancel() {
+    Router.go('/');
+  }
+
   render() {
     const isEdit = this.editIndex !== null;
     return html`
@@ -160,7 +177,8 @@ export class AddEditEmployee extends LitElement {
             </div>
   
             <div class="actions">
-              <button type="submit">${isEdit ? 'Güncelle' : 'Ekle'}</button>
+              <button class="save-button" type="submit">${i18n.t('save')}</button>
+              <button class="cancel-button" type="button" @click=${this._cancel}>${i18n.t('cancel')}</button>
             </div>
           </form>
         </div>
