@@ -160,20 +160,20 @@ export class AddEditEmployee extends LitElement {
           <h2>${isEdit ? i18n.t('editEmployee') : i18n.t('addEmployee')}</h2>
           <form @submit=${this._submit}>
             <div class="row">
-              <form-field label="Adı" type="text" .value=${this.employee.firstName} @input=${e=>this._updateField('firstName', e)} required></form-field>
-              <form-field label="Soyadı" type="text" .value=${this.employee.lastName} @input=${e=>this._updateField('lastName', e)} required></form-field>
-              <form-field label="İşe Giriş Tarihi" type="date" .value=${this.employee.startDate} @input=${e=>this._updateField('startDate', e)} required></form-field>
+              <form-field label=${i18n.t('name')} type="text" .value=${this.employee.firstName} @input=${e=>this._updateField('firstName', e)} required></form-field>
+              <form-field label=${i18n.t('lastName')} type="text" .value=${this.employee.lastName} @input=${e=>this._updateField('lastName', e)} required></form-field>
+              <form-field label=${i18n.t('startDate')} type="date" .value=${this.employee.startDate} @input=${e=>this._updateField('startDate', e)} required></form-field>
             </div>
   
             <div class="row">
-              <form-field label="Doğum Tarihi" type="date" .value=${this.employee.birthDate} @input=${e=>this._updateField('birthDate', e)} required></form-field>
-              <form-field label="Telefon" type="tel" .value=${this.employee.phone} @input=${e=>this._updateField('phone', e)} required></form-field>
-              <form-field label="Email" type="email" .value=${this.employee.email} @input=${e=>this._updateField('email', e)} required></form-field>
+              <form-field label=${i18n.t('birthDate')} type="date" .value=${this.employee.birthDate} @input=${e=>this._updateField('birthDate', e)} required></form-field>
+              <form-field label=${i18n.t('phone')} type="tel" .value=${this.employee.phone} @input=${e=>this._updateField('phone', e)} required></form-field>
+              <form-field label=${i18n.t('email')} type="email" .value=${this.employee.email} @input=${e=>this._updateField('email', e)} required></form-field>
             </div>
   
             <div class="row">
-              <form-field label="Departman" type="text" .value=${this.employee.department} @input=${e=>this._updateField('department', e)} required></form-field>
-              <form-field label="Pozisyon" type="select" .value=${this.employee.position} .options=${this.positions} @input=${e=>this._updateField('position', e)} required></form-field>
+              <form-field label=${i18n.t('department')} type="text" .value=${this.employee.department} @input=${e=>this._updateField('department', e)} required></form-field>
+              <form-field label=${i18n.t('position')} type="select" .value=${this.employee.position} .options=${this.positions} @input=${e=>this._updateField('position', e)} required></form-field>
             </div>
   
             <div class="actions">

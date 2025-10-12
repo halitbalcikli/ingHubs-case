@@ -24,5 +24,10 @@
   "editEmployee": "Çalışanı Düzenle",
   "addEmployee": "Çalışan Ekle",
   "add": "Ekle",
-  "update": "Güncelle"
+  "update": "Güncelle",
+  "pleaseSelect": "Lütfen seçiniz",
+  "required": "Bu alan zorunludur",
+  "invalidFormat": "Geçersiz format",
+  "invalidEmail": "Geçerli bir email adresi giriniz",
+  "invalidPhone": "Geçerli bir telefon numarası giriniz"
 }

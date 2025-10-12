@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { i18n } from '../i18n/i18n.js';
 
 export class FormField extends LitElement {
   static properties = {
@@ -17,6 +18,11 @@ export class FormField extends LitElement {
   constructor() {
     super();
     this._error = '';
+
+    window.addEventListener('lang-changed', (e) => {
+      this.lang = e.detail.lang;
+      this.requestUpdate();
+    });
   }
 
   static styles = css`
@@ -56,7 +62,7 @@ export class FormField extends LitElement {
 
   _validate(value) {
     if (this.required && (!value || value.trim() === '')) {
-      return this.errorMessage || 'Bu alan zorunludur';
+      return this.errorMessage || i18n.t('required');
     }
 
     if (!value || value.trim() === '') {
@@ -74,21 +80,21 @@ export class FormField extends LitElement {
     if (this.pattern) {
       const regex = new RegExp(this.pattern);
       if (!regex.test(value)) {
-        return this.errorMessage || 'Geçersiz format';
+        return this.errorMessage || i18n.t('invalidFormat');
       }
     }
 
     if (this.type === 'email' && value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(value)) {
-        return this.errorMessage || 'Geçerli bir email adresi giriniz';
+        return this.errorMessage || i18n.t('invalidEmail');
       }
     }
 
     if (this.type === 'tel' && value) {
       const phoneRegex = /^[\d\s\-\+\(\)]+$/;
       if (!phoneRegex.test(value)) {
-        return this.errorMessage || 'Geçerli bir telefon numarası giriniz';
+        return this.errorMessage || i18n.t('invalidPhone');
       }
     }
 
@@ -156,7 +162,7 @@ export class FormField extends LitElement {
               @input=${this._handleInput}
               @change=${this._handleChange}
               ?required=${this.required}>
-              <option value="">Seçiniz</option>
+              <option value="">${i18n.t('pleaseSelect')}</option>
               ${this.options?.map(opt => html`<option value=${opt}>${opt}</option>`)}
             </select>`
           : html`<input 

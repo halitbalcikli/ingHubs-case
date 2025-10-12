@@ -22,5 +22,10 @@
   "editEmployee": "Edit Employee",
   "addEmployee": "Add Employee",
   "add": "Add",
-  "update": "Update"
+  "update": "Update",
+  "pleaseSelect": "Please select",
+  "required": "This field is required",
+  "invalidFormat": "Invalid format",
+  "invalidEmail": "Please enter a valid email",
+  "invalidPhone": "Please enter a valid phone"
 }
