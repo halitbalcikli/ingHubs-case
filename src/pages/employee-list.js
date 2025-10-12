@@ -14,7 +14,7 @@ import menuIcon from '../assets/icons/menu.svg';
 import { Router } from '@vaadin/router';
 
 import '../components/pagination-component.js';
-import '../components/confirm-modal.js'; // confirm modal
+import '../components/confirm-modal.js'; 
 
 export class EmployeeList extends LitElement {
   static styles = css`
@@ -118,11 +118,9 @@ export class EmployeeList extends LitElement {
     selectedEmployees: { type: Object },
     currentPage: { type: Number },
     itemsPerPage: { type: Number },
-
-    // Modal properties
     modalOpen: { type: Boolean },
     modalMessage: { type: String },
-    deleteTarget: { type: Object }, // tekli veya çoklu silme hedefi
+    deleteTarget: { type: Object }, 
   };
 
   constructor() {
@@ -167,7 +165,6 @@ export class EmployeeList extends LitElement {
     }
   }
 
-  /* ---------------- MODAL İLE DELETE ---------------- */
   handleDeleteEmployee(emp) {
     this.modalOpen = true;
     this.modalMessage = `${emp.firstName} ${emp.lastName} adlı çalışanı silmek istediğinize emin misiniz?`;
@@ -213,7 +210,6 @@ export class EmployeeList extends LitElement {
     this.deleteTarget = null;
   }
 
-  /* ---------------- SELECTION ---------------- */
   handleSelectEmployee(emp, event) {
     if (event.target.checked) {
       this.selectedEmployees.add(emp);
