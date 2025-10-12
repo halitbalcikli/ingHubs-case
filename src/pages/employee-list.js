@@ -225,30 +225,30 @@ export class EmployeeList extends LitElement {
                   <th class="employee-table-cell">
                     <input type="checkbox" @change=${this.handleSelectAll} .checked=${allSelected} />
                   </th>
-                  <th>${i18n.t('name')}</th>
-                  <th>${i18n.t('lastName')}</th>
-                  <th>${i18n.t('startDate')}</th>
-                  <th>${i18n.t('birthDate')}</th>
-                  <th>${i18n.t('phone')}</th>
-                  <th>${i18n.t('email')}</th>
-                  <th>${i18n.t('department')}</th>
-                  <th>${i18n.t('position')}</th>
-                  <th>${i18n.t('actions')}</th>
+                  <th class="employee-table-cell">${i18n.t('name')}</th>
+                  <th class="employee-table-cell">${i18n.t('lastName')}</th>
+                  <th class="employee-table-cell">${i18n.t('startDate')}</th>
+                  <th class="employee-table-cell">${i18n.t('birthDate')}</th>
+                  <th class="employee-table-cell">${i18n.t('phone')}</th>
+                  <th class="employee-table-cell">${i18n.t('email')}</th>
+                  <th class="employee-table-cell">${i18n.t('department')}</th>
+                  <th class="employee-table-cell">${i18n.t('position')}</th>
+                  <th class="employee-table-cell">${i18n.t('actions')}</th>
                 </tr>
               </thead>
               <tbody>
                 ${this.paginatedEmployees.map(emp => html`
                   <tr>
-                    <td><input type="checkbox" .checked=${this.selectedEmployees.has(emp)} @change=${(e) => this.handleSelectEmployee(emp, e)} /></td>
-                    <td>${emp.firstName}</td>
-                    <td>${emp.lastName}</td>
-                    <td>${emp.startDate}</td>
-                    <td>${emp.birthDate}</td>
-                    <td>${emp.phone}</td>
-                    <td>${emp.email}</td>
-                    <td>${emp.department}</td>
-                    <td>${emp.position}</td>
-                    <td>
+                    <td class="employee-table-cell" ><input type="checkbox" .checked=${this.selectedEmployees.has(emp)} @change=${(e) => this.handleSelectEmployee(emp, e)} /></td>
+                    <td class="employee-table-cell"> ${emp.firstName}</td>
+                    <td class="employee-table-cell"> ${emp.lastName}</td>
+                    <td class="employee-table-cell"> ${emp.startDate}</td>
+                    <td class="employee-table-cell"> ${emp.birthDate}</td>
+                    <td class="employee-table-cell"> ${emp.phone}</td>
+                    <td class="employee-table-cell"> ${emp.email}</td>
+                    <td class="employee-table-cell"> ${emp.department}</td>
+                    <td class="employee-table-cell"> ${emp.position}</td>
+                    <td class="employee-table-cell">
                       <img @click=${() => this.handleEditEmployee(emp)} src=${editIcon} style="width:20px; cursor:pointer;" />
                       <img @click=${() => this.handleDeleteEmployee(emp)} src=${trashIcon} style="width:20px; cursor:pointer;" />
                     </td>
