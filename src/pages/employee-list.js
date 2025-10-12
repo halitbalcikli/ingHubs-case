@@ -14,12 +14,24 @@ import menuIcon from '../assets/icons/menu.svg';
 import { Router } from '@vaadin/router';
 
 import '../components/pagination-component.js';
+import '../components/confirm-modal.js'; // confirm modal
 
 export class EmployeeList extends LitElement {
   static styles = css`
-    section { background: #F1F2F7; height: 100vh; overflow-y:auto; } 
-    table { width: 100%; border-collapse: collapse; } 
-    th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+    section { 
+      background: #F1F2F7; 
+      height: 100vh; 
+      overflow-y: auto; 
+    } 
+    table { 
+      width: 100%; 
+      border-collapse: collapse; 
+    } 
+    th, td { 
+      border: 1px solid #ccc; 
+      padding: 0.5rem; 
+      text-align: left; 
+    }
     .employee-card-container {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -33,8 +45,8 @@ export class EmployeeList extends LitElement {
     }
     .employee-card {
       background: #f6f6f6;
+      border-radius: 12px;
       padding: 16px;
-      margin-right: 20px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
     .employee-card-square {
@@ -64,7 +76,7 @@ export class EmployeeList extends LitElement {
     .employee-table {
       margin-top: 20px;
       background: #fff; 
-      border-collapse: collapse
+      border-collapse: collapse;
     }
     .employee-list-title {
       font-size: 24px;
@@ -106,6 +118,11 @@ export class EmployeeList extends LitElement {
     selectedEmployees: { type: Object },
     currentPage: { type: Number },
     itemsPerPage: { type: Number },
+
+    // Modal properties
+    modalOpen: { type: Boolean },
+    modalMessage: { type: String },
+    deleteTarget: { type: Object }, // tekli veya çoklu silme hedefi
   };
 
   constructor() {
@@ -115,7 +132,11 @@ export class EmployeeList extends LitElement {
     this.selectedEmployees = new Set();
 
     this.currentPage = 1;
-    this.itemsPerPage = 5; 
+    this.itemsPerPage = 5;
+
+    this.modalOpen = false;
+    this.modalMessage = '';
+    this.deleteTarget = null;
 
     store.subscribe(() => {
       this.employees = store.getState().employees;
@@ -146,17 +167,53 @@ export class EmployeeList extends LitElement {
     }
   }
 
+  /* ---------------- MODAL İLE DELETE ---------------- */
   handleDeleteEmployee(emp) {
-    const index = this.employees.findIndex(e => e === emp);
-    if (index !== -1 && confirm(`${emp.firstName} ${emp.lastName} adlı çalışanı silmek istediğinize emin misiniz?`)) {
-      store.dispatch(deleteEmployee(index));
+    this.modalOpen = true;
+    this.modalMessage = `${emp.firstName} ${emp.lastName} adlı çalışanı silmek istediğinize emin misiniz?`;
+    this.deleteTarget = { type: 'single', emp };
+  }
 
-      if (this.paginatedEmployees.length === 1 && this.currentPage > 1) {
-        this.currentPage--;
-      }
+  handleBulkDelete() {
+    if (this.selectedEmployees.size === 0) {
+      alert('Silmek için en az bir çalışan seçin.');
+      return;
+    }
+
+    this.modalOpen = true;
+    this.modalMessage = `${this.selectedEmployees.size} çalışanı silmek istediğinize emin misiniz?`;
+    this.deleteTarget = { type: 'bulk' };
+  }
+
+  confirmDelete() {
+    if (!this.deleteTarget) return;
+
+    if (this.deleteTarget.type === 'single') {
+      const emp = this.deleteTarget.emp;
+      const index = this.employees.findIndex(e => e === emp);
+      if (index !== -1) store.dispatch(deleteEmployee(index));
+    } else if (this.deleteTarget.type === 'bulk') {
+      this.selectedEmployees.forEach(emp => {
+        const index = this.employees.findIndex(e => e === emp);
+        if (index !== -1) store.dispatch(deleteEmployee(index));
+      });
+      this.selectedEmployees.clear();
+    }
+
+    this.modalOpen = false;
+    this.deleteTarget = null;
+
+    if (this.paginatedEmployees.length === 0 && this.currentPage > 1) {
+      this.currentPage--;
     }
   }
 
+  cancelDelete() {
+    this.modalOpen = false;
+    this.deleteTarget = null;
+  }
+
+  /* ---------------- SELECTION ---------------- */
   handleSelectEmployee(emp, event) {
     if (event.target.checked) {
       this.selectedEmployees.add(emp);
@@ -174,23 +231,6 @@ export class EmployeeList extends LitElement {
       currentPageEmployees.forEach(emp => this.selectedEmployees.delete(emp));
     }
     this.requestUpdate();
-  }
-
-  handleBulkDelete() {
-    if (this.selectedEmployees.size === 0) {
-      alert('Silmek için en az bir çalışan seçin.');
-      return;
-    }
-
-    if (confirm(`${this.selectedEmployees.size} çalışanı silmek istediğinize emin misiniz?`)) {
-      this.selectedEmployees.forEach(emp => {
-        const index = this.employees.findIndex(e => e === emp);
-        if (index !== -1) {
-          store.dispatch(deleteEmployee(index));
-        }
-      });
-      this.selectedEmployees.clear();
-    }
   }
 
   handlePageChange(e) {
@@ -239,15 +279,15 @@ export class EmployeeList extends LitElement {
               <tbody>
                 ${this.paginatedEmployees.map(emp => html`
                   <tr>
-                    <td class="employee-table-cell" ><input type="checkbox" .checked=${this.selectedEmployees.has(emp)} @change=${(e) => this.handleSelectEmployee(emp, e)} /></td>
-                    <td class="employee-table-cell"> ${emp.firstName}</td>
-                    <td class="employee-table-cell"> ${emp.lastName}</td>
-                    <td class="employee-table-cell"> ${emp.startDate}</td>
-                    <td class="employee-table-cell"> ${emp.birthDate}</td>
-                    <td class="employee-table-cell"> ${emp.phone}</td>
-                    <td class="employee-table-cell"> ${emp.email}</td>
-                    <td class="employee-table-cell"> ${emp.department}</td>
-                    <td class="employee-table-cell"> ${emp.position}</td>
+                    <td class="employee-table-cell"><input type="checkbox" .checked=${this.selectedEmployees.has(emp)} @change=${(e) => this.handleSelectEmployee(emp, e)} /></td>
+                    <td class="employee-table-cell">${emp.firstName}</td>
+                    <td class="employee-table-cell">${emp.lastName}</td>
+                    <td class="employee-table-cell">${emp.startDate}</td>
+                    <td class="employee-table-cell">${emp.birthDate}</td>
+                    <td class="employee-table-cell">${emp.phone}</td>
+                    <td class="employee-table-cell">${emp.email}</td>
+                    <td class="employee-table-cell">${emp.department}</td>
+                    <td class="employee-table-cell">${emp.position}</td>
                     <td class="employee-table-cell">
                       <img @click=${() => this.handleEditEmployee(emp)} src=${editIcon} style="width:20px; cursor:pointer;" />
                       <img @click=${() => this.handleDeleteEmployee(emp)} src=${trashIcon} style="width:20px; cursor:pointer;" />
@@ -257,19 +297,18 @@ export class EmployeeList extends LitElement {
               </tbody>
             </table>
           ` : html`
-          
             <div class="employee-card-container">
               ${this.paginatedEmployees.map(emp => html`
-                <div class="employee-card employee-card-square">
+                <div class="employee-card">
                   <div class="employee-info-grid">
-                    <div><strong>${i18n.t('name')}:</strong> <div>${emp.firstName}</div></div>
-                    <div><strong>${i18n.t('lastName')}:</strong> <div>${emp.lastName}</div></div>
-                    <div><strong>${i18n.t('startDate')}:</strong> <div>${emp.startDate}</div></div>
-                    <div><strong>${i18n.t('birthDate')}:</strong> <div>${emp.birthDate}</div></div>
-                    <div><strong>${i18n.t('phone')}:</strong> <div>${emp.phone}</div></div>
-                    <div><strong>${i18n.t('email')}:</strong> <div>${emp.email}</div></div>
-                    <div><strong>${i18n.t('department')}:</strong> <div>${emp.department}</div></div>
-                    <div><strong>${i18n.t('position')}:</strong> <div>${emp.position}</div></div>
+                    <div><strong>${i18n.t('name')}:</strong> ${emp.firstName}</div>
+                    <div><strong>${i18n.t('lastName')}:</strong> ${emp.lastName}</div>
+                    <div><strong>${i18n.t('startDate')}:</strong> ${emp.startDate}</div>
+                    <div><strong>${i18n.t('birthDate')}:</strong> ${emp.birthDate}</div>
+                    <div><strong>${i18n.t('phone')}:</strong> ${emp.phone}</div>
+                    <div><strong>${i18n.t('email')}:</strong> ${emp.email}</div>
+                    <div><strong>${i18n.t('department')}:</strong> ${emp.department}</div>
+                    <div><strong>${i18n.t('position')}:</strong> ${emp.position}</div>
                   </div>
                   <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
                     <button style="background:#091C5A; color:white; padding:8px; border-radius:4px;" @click=${() => this.handleEditEmployee(emp)}>
@@ -290,6 +329,13 @@ export class EmployeeList extends LitElement {
             .currentPage=${this.currentPage}
             @page-change=${this.handlePageChange}
           ></pagination-component>
+
+          <confirm-modal
+            .open=${this.modalOpen}
+            .message=${this.modalMessage}
+            @confirm=${this.confirmDelete}
+            @cancel=${this.cancelDelete}
+          ></confirm-modal>
         </div>
       </section>
     `;
