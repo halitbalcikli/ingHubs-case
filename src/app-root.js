@@ -17,6 +17,7 @@ export class AppRoot extends LitElement {
     router.setRoutes([
       { path: '/', component: 'employee-list' },
       { path: '/add-edit-employee', component: 'add-edit-employee' },
+      { path: '/add-edit-employee/:id', component: 'add-edit-employee' },
       { path: '(.*)', redirect: '/' }
     ]);
   }

@@ -1,6 +1,8 @@
 import { LitElement, html, css } from 'lit';
-import { store } from '../store.js';
+import { store, deleteEmployee } from '../store.js';
 import { i18n } from '../i18n/i18n.js';
+
+import { Router } from '@vaadin/router';
 
 export class EmployeeList extends LitElement {
   static styles = css`
@@ -38,7 +40,7 @@ export class EmployeeList extends LitElement {
     this.view = 'table';
     this.employees = store.getState().employees;
 
-    // Redux subscribe ile reactive güncelleme
+    // Redux subscribe
     store.subscribe(() => {
       this.employees = store.getState().employees;
       this.requestUpdate();
@@ -48,31 +50,39 @@ export class EmployeeList extends LitElement {
       this.lang = e.detail.lang;
       this.requestUpdate();
     });
-    
   }
 
   changeView(view) {
     this.view = view;
-    this.requestUpdate(); // render'ı tetikler
+    this.requestUpdate();
+  }
+
+  handleEditEmployee(emp) {
+    const index = this.employees.findIndex(e => e === emp);
+    if (index !== -1) {
+      Router.go(`/add-edit-employee/${index}`);
+    }
+  }
+
+  handleDeleteEmployee(emp) {
+    const index = this.employees.findIndex(e => e === emp);
+    if (index !== -1 && confirm(`${emp.firstName} ${emp.lastName} adlı çalışanı silmek istediğinize emin misiniz?`)) {
+      store.dispatch(deleteEmployee(index));
+    }
   }
 
   render() {
     return html`
       <section>
-        <div class="employee-list-container" style="display:flex; align-items:center; justify-content:space-between;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
           <h2 style="margin:0;">${i18n.t('employeeList')}</h2>
           <div style="display:flex; gap:0.5rem;">
-            <!-- Table Icon -->
-            <button @click=${() => this.changeView('table')} style="background:none; border:none; cursor:pointer;" title="Tablo Görünümü">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#444"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="9" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/><rect x="15" y="9" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/></svg>
-            </button>
-            <!-- Card Icon -->
-            <button @click=${() => this.changeView('card')} style="background:none; border:none; cursor:pointer;" title="Kart Görünümü">
-              <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="#444"><rect x="4" y="6" width="16" height="12" rx="2"/><rect x="7" y="9" width="10" height="2" rx="1" fill="#888"/><rect x="7" y="13" width="6" height="2" rx="1" fill="#bbb"/></svg>
-            </button>
+            <button @click=${() => this.changeView('table')} title="Tablo Görünümü">📋</button>
+            <button @click=${() => this.changeView('card')} title="Kart Görünümü">🗂️</button>
           </div>
         </div>
-          ${this.view === 'table' ? html`
+
+        ${this.view === 'table' ? html`
           <table>
             <thead>
               <tr>
@@ -84,6 +94,7 @@ export class EmployeeList extends LitElement {
                 <th>Email</th>
                 <th>Departman</th>
                 <th>Pozisyon</th>
+                <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
@@ -94,32 +105,39 @@ export class EmployeeList extends LitElement {
                   <td>${emp.startDate}</td>
                   <td>${emp.birthDate}</td>
                   <td>${emp.phone}</td>
-                <td>${emp.email}</td>
-                <td>${emp.department}</td>
-                <td>${emp.position}</td>
-              </tr>
-            `)}
-            ` : html`
-              <div class="employee-card-container">
-                ${this.employees.map(emp => html`
-                  <div class="employee-card">
-                    <div class="employee-info-grid">
-                      <div><strong>First Name:</strong> ${emp.firstName}</div>
-                      <div><strong>Last Name:</strong> ${emp.lastName}</div>
-                      <div><strong>Start Date:</strong> ${emp.startDate}</div>
-                      <div><strong>Birth Date:</strong> ${emp.birthDate}</div>
-                      <div><strong>Phone:</strong> ${emp.phone}</div>
-                      <div><strong>Email:</strong> ${emp.email}</div>
-                      <div><strong>Department:</strong> ${emp.department}</div>
-                      <div><strong>Position:</strong> ${emp.position}</div>
-                    </div>
-                  </div>
-                `)}
+                  <td>${emp.email}</td>
+                  <td>${emp.department}</td>
+                  <td>${emp.position}</td>
+                  <td>
+                    <button @click=${() => this.handleEditEmployee(emp)}>Düzenle</button>
+                    <button @click=${() => this.handleDeleteEmployee(emp)}>Sil</button>
+                  </td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
+        ` : html`
+          <div class="employee-card-container">
+            ${this.employees.map(emp => html`
+              <div class="employee-card">
+                <div class="employee-info-grid">
+                  <div><strong>Adı:</strong> ${emp.firstName}</div>
+                  <div><strong>Soyadı:</strong> ${emp.lastName}</div>
+                  <div><strong>İşe Giriş:</strong> ${emp.startDate}</div>
+                  <div><strong>Doğum:</strong> ${emp.birthDate}</div>
+                  <div><strong>Telefon:</strong> ${emp.phone}</div>
+                  <div><strong>Email:</strong> ${emp.email}</div>
+                  <div><strong>Departman:</strong> ${emp.department}</div>
+                  <div><strong>Pozisyon:</strong> ${emp.position}</div>
+                </div>
+                <div style="margin-top:0.5rem; display:flex; gap:0.5rem;">
+                  <button @click=${() => this.handleEditEmployee(emp)}>Düzenle</button>
+                  <button @click=${() => this.handleDeleteEmployee(emp)}>Sil</button>
+                </div>
               </div>
-            `}
-            </div>
-          </tbody>
-        </table>
+            `)}
+          </div>
+        `}
       </section>
     `;
   }

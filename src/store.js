@@ -13,11 +13,16 @@ const employeesSlice = createSlice({
       const { index, data } = action.payload;
       state[index] = data;
       localStorage.setItem('employees', JSON.stringify(state));
+    },
+    deleteEmployee: (state, action) => {
+      const index = action.payload;
+      state.splice(index, 1);
+      localStorage.setItem('employees', JSON.stringify(state));
     }
   }
 });
 
-export const { addEmployee, updateEmployee } = employeesSlice.actions;
+export const { addEmployee, updateEmployee, deleteEmployee } = employeesSlice.actions;
 
 // Store
 export const store = configureStore({

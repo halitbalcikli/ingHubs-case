@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
+import { Router } from '@vaadin/router';
 import '../components/form-field.js';
-import { store, addEmployee } from '../store.js';
+import { store, addEmployee, updateEmployee } from '../store.js';
 
 export class AddEditEmployee extends LitElement {
   static styles = css`
@@ -22,117 +23,71 @@ export class AddEditEmployee extends LitElement {
       position: ''
     };
     this.positions = ['Junior', 'Mid', 'Senior'];
+    this.editIndex = null;
+  }
+
+  // ✅ @vaadin/router buraya location bilgisini geçirir
+  onBeforeEnter(location) {
+    const id = location.params.id;
+    if (id !== undefined) {
+      this.editIndex = parseInt(id);
+      const employees = store.getState().employees;
+      const emp = employees[this.editIndex];
+      if (emp) {
+        this.employee = { ...emp };
+      }
+    }
+  }
+
+  _updateField(key, e) {
+    this.employee[key] = e.detail?.value ?? e.target.value;
+    this.requestUpdate();
   }
 
   _submit(e) {
     e.preventDefault();
-    
     const formFields = this.shadowRoot.querySelectorAll('form-field');
     let isValid = true;
-
-    
-    formFields.forEach(field => {
-      if (!field.validate()) {
-        isValid = false;
-      }
-    });
+    formFields.forEach(field => { if (!field.validate()) isValid = false; });
 
     if (!isValid) {
-      this._showToast('Lütfen tüm zorunlu alanları doğru şekilde doldurunuz!');
+      alert('Lütfen tüm alanları doğru doldurun.');
       return;
     }
 
-    store.dispatch(addEmployee(this.employee));
+    if (this.editIndex !== null) {
+      store.dispatch(updateEmployee({ index: this.editIndex, data: this.employee }));
+      alert('Çalışan bilgisi güncellendi!');
+    } else {
+      store.dispatch(addEmployee(this.employee));
+      alert('Yeni çalışan eklendi!');
+    }
 
-    this.employee = { firstName:'', lastName:'', startDate:'', birthDate:'', phone:'', email:'', department:'', position:'' };
-    this.requestUpdate();
-  }
-
-  _updateField(key, e) {
-    // CustomEvent kullanıldığı için e.detail.value kontrol et
-    this.employee[key] = e.detail?.value ?? e.target.value;
-    console.log(`Updated ${key}:`, this.employee[key], 'Full employee:', this.employee);
-    this.requestUpdate();
+    Router.go('/');
   }
 
   render() {
+    const isEdit = this.editIndex !== null;
     return html`
-      <h2>Çalışan Ekle</h2>
+      <h2>${isEdit ? 'Çalışanı Düzenle' : 'Çalışan Ekle'}</h2>
       <form @submit=${this._submit}>
         <div class="form-grid">
           <div class="row">
-            <form-field 
-              label="Adı" 
-              type="text" 
-              .value=${this.employee.firstName} 
-              @input=${e=>this._updateField('firstName', e)}
-              required
-              minLength=${2}
-              errorMessage="Adı en az 2 karakter olmalıdır">
-            </form-field>
-            <form-field 
-              label="Soyadı" 
-              type="text" 
-              .value=${this.employee.lastName} 
-              @input=${e=>this._updateField('lastName', e)}
-              required
-              maxLength=${20}
-              errorMessage="Soyadı en fazle 20 karakter olmalıdır">
-            </form-field>
-            <form-field 
-              label="İşe Giriş Tarihi" 
-              type="date" 
-              .value=${this.employee.startDate} 
-              @input=${e=>this._updateField('startDate', e)}
-              required>
-            </form-field>
+            <form-field label="Adı" type="text" .value=${this.employee.firstName} @input=${e=>this._updateField('firstName', e)} required></form-field>
+            <form-field label="Soyadı" type="text" .value=${this.employee.lastName} @input=${e=>this._updateField('lastName', e)} required></form-field>
+            <form-field label="İşe Giriş Tarihi" type="date" .value=${this.employee.startDate} @input=${e=>this._updateField('startDate', e)} required></form-field>
           </div>
           <div class="row">
-            <form-field 
-              label="Doğum Tarihi" 
-              type="date" 
-              .value=${this.employee.birthDate} 
-              @input=${e=>this._updateField('birthDate', e)}
-              required>
-            </form-field>
-            <form-field 
-              label="Telefon" 
-              type="tel" 
-              .value=${this.employee.phone} 
-              @input=${e=>this._updateField('phone', e)}
-              required
-              minLength=${10}
-              errorMessage="Geçerli bir telefon numarası giriniz (en az 10 karakter)">
-            </form-field>
-            <form-field 
-              label="Email" 
-              type="email" 
-              .value=${this.employee.email} 
-              @input=${e=>this._updateField('email', e)}
-              required>
-            </form-field>
+            <form-field label="Doğum Tarihi" type="date" .value=${this.employee.birthDate} @input=${e=>this._updateField('birthDate', e)} required></form-field>
+            <form-field label="Telefon" type="tel" .value=${this.employee.phone} @input=${e=>this._updateField('phone', e)} required></form-field>
+            <form-field label="Email" type="email" .value=${this.employee.email} @input=${e=>this._updateField('email', e)} required></form-field>
           </div>
           <div class="row">
-            <form-field 
-              label="Departman" 
-              type="text" 
-              .value=${this.employee.department} 
-              @input=${e=>this._updateField('department', e)}
-              required
-              minLength=${2}
-              errorMessage="Departman en az 2 karakter olmalıdır">
-            </form-field>
-            <form-field 
-              label="Pozisyon" 
-              type="select" 
-              .value=${this.employee.position} 
-              .options=${this.positions} 
-              @input=${e=>this._updateField('position', e)}
-              required>
-            </form-field>
+            <form-field label="Departman" type="text" .value=${this.employee.department} @input=${e=>this._updateField('department', e)} required></form-field>
+            <form-field label="Pozisyon" type="select" .value=${this.employee.position} .options=${this.positions} @input=${e=>this._updateField('position', e)} required></form-field>
           </div>
         </div>
-        <button type="submit">Çalışan Ekle</button>
+        <button type="submit">${isEdit ? 'Güncelle' : 'Ekle'}</button>
       </form>
     `;
   }
