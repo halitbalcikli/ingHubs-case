@@ -31,6 +31,8 @@ export class EmployeeList extends LitElement {
       border: 1px solid #ccc; 
       padding: 0.5rem; 
       text-align: left; 
+      font-size: 14px;
+      white-space: nowrap;
     }
     .employee-card-container {
       display: grid;
@@ -48,10 +50,6 @@ export class EmployeeList extends LitElement {
       border-radius: 12px;
       padding: 16px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .employee-card-square {
-      width: 450px;
-      object-fit: cover;
     }
     .employee-info-grid {
       display: grid;
@@ -101,6 +99,8 @@ export class EmployeeList extends LitElement {
       align-items: center;
       justify-content: space-between;
       margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .bulk-delete-button {
       background: #FF6600;
@@ -110,7 +110,69 @@ export class EmployeeList extends LitElement {
       border-radius: 4px;
       cursor: pointer;
     }
+    @media (max-width: 1024px) {
+      .employee-card-container {
+        grid-template-columns: 1fr;
+        width: 95%;
+        gap: 16px;
+      }
+    }
+    @media (max-width: 768px) {
+      .employee-list-container {
+        width: 100%;
+        padding: 0 10px;
+      }
+      table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+      th, td {
+        font-size: 12px;
+        padding: 8px;
+      }
+      .employee-list-title {
+        font-size: 20px;
+      }
+      .bulk-delete-button {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .employee-card-container {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        width: 95%;
+      }
+      .employee-card {
+        padding: 12px;
+      }
+      .employee-card button {
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+      img[alt="Tablo Görünümü"], img[alt="Kart Görünümü"] {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .employee-list-title {
+        font-size: 18px;
+      }
+      .employee-card {
+        padding: 10px;
+      }
+      .employee-info-grid div {
+        font-size: 12px;
+      }
+      .bulk-delete-button {
+        font-size: 11px;
+        padding: 5px 10px;
+      }
+    }
   `;
+
 
   static properties = {
     view: { type: String },
