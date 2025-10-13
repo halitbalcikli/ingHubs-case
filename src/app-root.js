@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { Router } from '@vaadin/router';
+import { i18n } from './i18n/i18n.js';
 import './components/header-component.js';
 import './pages/employee-list.js';
 import './pages/add-edit-employee.js';
@@ -10,6 +11,12 @@ export class AppRoot extends LitElement {
       padding: 0;
     }
   `;
+
+  async connectedCallback() {
+    super.connectedCallback();
+    
+    await i18n.load(i18n.lang);
+  }
 
   firstUpdated() {
     const outlet = this.renderRoot.querySelector('#outlet');
