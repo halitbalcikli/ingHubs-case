@@ -163,7 +163,7 @@ export class FormField extends LitElement {
               @change=${this._handleChange}
               ?required=${this.required}>
               <option value="">${i18n.t('pleaseSelect')}</option>
-              ${this.options?.map(opt => html`<option value=${opt}>${opt}</option>`)}
+              ${this.options?.map(opt => html`<option value=${opt} ?selected=${opt === this.value}>${opt}</option>`)}
             </select>`
           : html`<input 
               class=${cssClass}
